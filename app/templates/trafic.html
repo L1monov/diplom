@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Traffic - FastAPI Project{% endblock %}
+
+{% block content %}
+    <h2>Current Network Traffic</h2>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Address</th>
+                <th>Packets</th>
+                <th>Bytes</th>
+                <th>TX Packets</th>
+                <th>TX Bytes</th>
+                <th>RX Packets</th>
+                <th>RX Bytes</th>
+                <th>Country</th>
+                <th>City</th>
+                <th>AS Number</th>
+                <th>AS Organization</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody id="traffic-table">
+            {% for traffic in new_trafic %}
+                <tr>
+                    <td>{{ traffic.address }}</td>
+                    <td>{{ traffic.packets }}</td>
+                    <td>{{ traffic.bytes }}</td>
+                    <td>{{ traffic.tx_packets }}</td>
+                    <td>{{ traffic.tx_bytes }}</td>
+                    <td>{{ traffic.rx_packets }}</td>
+                    <td>{{ traffic.rx_bytes }}</td>
+                    <td>{{ traffic.country }}</td>
+                    <td>{{ traffic.city }}</td>
+                    <td>{{ traffic.as_number }}</td>
+                    <td>{{ traffic.as_organization }}</td>
+                    <td>{{ traffic.description }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function fetchNewTraffic() {
+            fetch("/get_trafic")  // Делаем запрос к новому маршруту /get_trafic
+                .then(response => response.json())  // Получаем данные в формате JSON
+                .then(newTraffic => {
+                    const tableBody = document.querySelector("#traffic-table");
+
+                    // Добавляем новые строки сверху
+                    newTraffic.forEach(traffic => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${traffic.address}</td>
+                            <td>${traffic.packets}</td>
+                            <td>${traffic.bytes}</td>
+                            <td>${traffic.tx_packets}</td>
+                            <td>${traffic.tx_bytes}</td>
+                            <td>${traffic.rx_packets}</td>
+                            <td>${traffic.rx_bytes}</td>
+                            <td>${traffic.country}</td>
+                            <td>${traffic.city}</td>
+                            <td>${traffic.as_number}</td>
+                            <td>${traffic.as_organization}</td>
+                            <td>${traffic.description}</td>
+                        `;
+                        tableBody.insertBefore(row, tableBody.firstChild);  // Вставляем новую строку в начало
+                    });
+                });
+        }
+
+        // Обновление данных каждые 5 секунд
+        setInterval(fetchNewTraffic, 5000);
+    </script>
+{% endblock %}
